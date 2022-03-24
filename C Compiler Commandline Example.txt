@@ -1,0 +1,5 @@
+gcc -o <filename> <filename>.c <another filename>.o <yet another filename>.o -Wall
+
+Example, for test6.c
+
+gcc -o test6 test6.c simple_arm_graphics.o font_VGA_9x16.o Test_BMP.o -Wall

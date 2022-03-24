@@ -1,0 +1,15 @@
+as -o <filename>.o <filename>.s
+
+Example:
+
+as -o simple_arm_graphics.o simple_arm_graphics.s
+
+
+
+Or if you like to read assembler listing files (I do from time to time)
+
+as -al -o <filename>.o <filename>.s > <filename>.lst
+
+Example:
+
+al -al -o simple_arm_graphics.o simple_arm_graphics.s > simple_arm_graphics.lst
