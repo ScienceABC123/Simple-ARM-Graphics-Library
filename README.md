@@ -14,15 +14,19 @@ SelectColors, selects the foreground and background colors for drawing and print
 SelectFont, selects the font used for printing
 
 PrintStringLeft, prints a left justified string at x,y location
+
 PrintStringRight, prints a right justified string at x,y location
+
 PrintStringCenter, prints a center justified string at x,y location
 
 DrawRectOutline, draws a foreground color rectangle bounded by x1,y1 and x2,y2
+
 DrawRectFilled, draws a foreground color rectangle filled with background color bounded by x1,y1 and x2,y2
 
 DrawLine, draws a foreground color line from x1,y1 to x2,y2
 
 DrawCircleOutline, draws a foreground color circle centered at x,y with a specified radius
+
 DrawCircleFilled, draws a foreground color circle filled with background color centered at x,y with a specified radius
 
 DisplayBMP, displays a BMP at x,y (x,y is the location of the BMP upper-lefthand corner)
