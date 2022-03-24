@@ -15,7 +15,7 @@ SelectFont, selects the font used for printing
 
 PrintStringLeft, prints a left justified string at x,y location
 PrintStringRight, prints a right justified string at x,y location
-PrintStringCenter, prints a center justified at x,y location
+PrintStringCenter, prints a center justified string at x,y location
 
 DrawRectOutline, draws a foreground color rectangle bounded by x1,y1 and x2,y2
 DrawRectFilled, draws a foreground color rectangle filled with background color bounded by x1,y1 and x2,y2
