@@ -44,3 +44,15 @@ I have tested the code pretty thoroughly, but if anyone finds an error, please l
 Finally, the copyright notice is only to ensure someone else doesn’t try to claim ownership. These files I’m freely making available for anyone to use, modify, and change, without any required attribution or compensation. I am making them henceforth “public domain" property.
 
 If you have any questions, feel free to contact me.
+
+UPDATE - 1/3/23
+
+The issue with possible "Segmentation Fault" by attempts to print strings off the screen was "grating" on me, so I finally addressed that issue. Attempting to print strings off screen will no longer cause dreaded segmentation faults. However, there are some consequences... Any attempt to print a string that is even one pixel above or below the screen will result in no string being printed. Any attempt to print a character that is even one pixel off the screen left or right will result in that character not being printed. So if you're missing characters at the begining or end of a string, tha's the reason why.
+
+I also added three new functions that I found to be useful:
+
+GetFontHeight, returns the cell height, in pixels, of the currently selected font
+
+GetStringLength, returns a specified string's length, in pixels, using the currently selected font
+
+GetPixelColor, returns the pixel color of a specified pixel (x,y)
