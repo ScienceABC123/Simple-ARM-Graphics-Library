@@ -46,6 +46,7 @@ Finally, the copyright notice is only to ensure someone else doesn’t try to cl
 If you have any questions, feel free to contact me.
 
 UPDATE - 1/3/23
+Version 1.1
 
 The issue with possible "Segmentation Fault" by attempts to print strings off the screen was "grating" on me, so I finally addressed that issue. Attempting to print strings off screen will no longer cause dreaded segmentation faults. However, there are some consequences... Any attempt to print a string that is even one pixel above or below the screen will result in no string being printed. Any attempt to print a character that is even one pixel off the screen left or right will result in that character not being printed. So if you're missing characters at the begining or end of a string, tha's the reason why.
 
@@ -56,3 +57,10 @@ GetFontHeight, returns the cell height, in pixels, of the currently selected fon
 GetStringLength, returns a specified string's length, in pixels, using the currently selected font
 
 GetPixelColor, returns the pixel color of a specified pixel (x,y)
+
+UPDATE - 2/20/24
+Version 1.2
+
+Minor rant: I was updating my Weather Station display with some BMPs and found that only about 1/3 of the BMPs would display correctly. After digging for a couple of days I found that Microsoft had buried a small detail in the notes about the BMP file format. It seems Microsoft pads "scanlines" with 0x00 bytes so they are always a word length (32-bits), which would make some sense if the offset in the BMP header pointed to a 32-bit boundary, which it does not! The BMP offset pointer always points to an odd half-word boundary (0b10).
+
+I rewrote the DisplayBMP function to fix the scanline padding issue, and it now works with all BMP files. If anyone comes accross a BMP file that isn't getting displayed correctly, please send me the details with the BMP file in question so I can fixed it.
