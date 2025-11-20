@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Simple ARM Graphics Library 1.3
+* Simple ARM Graphics Library 1.2
 *
 * This 2D graphics library is intended for the Raspberry Pi boards, but can be
 * used other ARM boards as long as the video buffer starts in the upper-lefthand
@@ -12,7 +12,7 @@
 * NOTE: There is no provisions for rotating anything drawn, as I said this is a
 * "simple" graphics library.
 *
-* Copyright (c) 2022, 2024, 2025
+* Copyright (c) 2022, 2024
 *
 *******************************************************************************/
 
@@ -40,10 +40,8 @@
 *	12/30/22	PMW	Added three new functions: GetFontHeight,
 *				GetStringLength, and GetPixelColor
 * ------------------------------------------------------------------------------
-* 1.2	2/14/24		PMW	Fixed DisplayBMP, it now takes into account padding
+* 1.2	2/14/24		PMW	Fixed DrawBMP, it now takes into account padding
 *				scan lines to end on a offset word boundary
-* ------------------------------------------------------------------------------
-* 1.3	3/12/25		PMW	Added one new function: SetPixelColor
 *
 *******************************************************************************/
 
@@ -73,7 +71,6 @@
 		.global	DisplayBMP		// DisplayBMP(BMP_ptr, x_pos, y_pos)
 
 		.global	GetPixelColor		// GetPixelColor(x_pos, y_pos)
-		.global	SetPixelColor		// SetPixelColor(pixel_color, x_pos, y_pos)
 
 // Equates (i.e. defines)
 
@@ -1371,7 +1368,6 @@ drwln7:
 		bne	drwln7				// Branch if not done
 
 drwln8:
-
 		mov	r0, #0				// No error
 		bal	drwln10
 
@@ -2227,6 +2223,7 @@ displayBMP5:
 		pop	{r4-r11}			// Pop r4-r11 off stack
 		bx	lr				// Return
 
+
 /*******************************************************************************
 *
 * GetPixelColor - Gets the RGB color of the pixel at a specified x,y location.
@@ -2295,78 +2292,6 @@ getpixcolor1:
 getpixcolor2:
 
 		pop	{r2}				// Pop r2 off stack
-		bx	lr				// Return
-
-/*******************************************************************************
-*
-* SetPixelColor - Sets the RGB color of the pixel at a specified x,y location.
-*
-* SetPixelColor(x_pos, y_pos)
-*  parameters:
-*    r0: RGB code		// pixel color (ex. 0x00RRGGBB)
-*    r1: x_pos			// x position (ex. 0-799)
-*    r2: y_pos			// y position (ex. 0-599)
-*  return:
-*       -1			// error
-*
-*******************************************************************************/
-
-		.type	SetPixelColor, %function
-
-SetPixelColor:
-
-		push	{r3}				// Push r3 on stack
-
-		cmp	r1, #0				// Check if x_pos is off screen, left
-		blt	setpixcolor1			// Branch if x_pos is off screen, left
-
-		movw	r3, #:lower16:H_SIZE		// Get screen horizontal size
-		movt	r3, #:upper16:H_SIZE
-		ldr	r3, [r3]
-
-		cmp	r1, r3				// Check if x_pos is off screen, right
-		bge	setpixcolor1			// Branch if x_pos is off screen, right
-
-		cmp	r2, #0				// Check if y_pos is off screen, top
-		blt	setpixcolor1			// Branch if y_pos is off screen, top
-
-		movw	r3, #:lower16:V_SIZE		// Get screen vertical size
-		movt	r3, #:upper16:V_SIZE
-		ldr	r3, [r3]
-
-		cmp	r2, r3				// Check if y_pos is off screen, bottom
-		bge	setpixcolor1			// Branch if y_pos is off screen, bottom
-
-		lsl	r1, r1, #2			// Compute horizontal offset in bytes (i.e. multiply x_pos by 4)
-
-		movw	r3, #:lower16:H_SIZE_BYTES	// Get screen horizontal size in bytes
-		movt	r3, #:upper16:H_SIZE_BYTES
-		ldr	r3, [r3]
-
-		mul	r2, r2, r3			// Compute vertical offset in bytes (i.e. multiply y_pos by screen horizontal size in bytes)
-
-		add	r2, r2, r1			// Add vertical and horizontal offsets in bytes together
-
-		movw	r1, #:lower16:FRM_BUF_ADR	// Get frame buffer address
-		movt	r1, #:upper16:FRM_BUF_ADR
-		ldr	r1, [r1]
-
-		add	r1, r1, r2			// Add horizontal and vertical offsets in bytes to frame buffer address
-
-// Note: r1 now contains the pixel address
-
-		str	r0, [r1]			// Set pixel RGB value
-
-		mov	r0, #0				// No error
-		bal	setpixcolor2
-
-setpixcolor1:
-
-		mov	r0, #-1				// Error
-
-setpixcolor2:
-
-		pop	{r3}				// Pop r3 off stack
 		bx	lr				// Return
 
 		.end

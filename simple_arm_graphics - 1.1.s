@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Simple ARM Graphics Library 1.3
+* Simple ARM Graphics Library 1.1
 *
 * This 2D graphics library is intended for the Raspberry Pi boards, but can be
 * used other ARM boards as long as the video buffer starts in the upper-lefthand
@@ -12,7 +12,7 @@
 * NOTE: There is no provisions for rotating anything drawn, as I said this is a
 * "simple" graphics library.
 *
-* Copyright (c) 2022, 2024, 2025
+* Copyright (c) 2022
 *
 *******************************************************************************/
 
@@ -39,11 +39,6 @@
 *				no long causes a "Segmentation Fault"
 *	12/30/22	PMW	Added three new functions: GetFontHeight,
 *				GetStringLength, and GetPixelColor
-* ------------------------------------------------------------------------------
-* 1.2	2/14/24		PMW	Fixed DisplayBMP, it now takes into account padding
-*				scan lines to end on a offset word boundary
-* ------------------------------------------------------------------------------
-* 1.3	3/12/25		PMW	Added one new function: SetPixelColor
 *
 *******************************************************************************/
 
@@ -73,7 +68,6 @@
 		.global	DisplayBMP		// DisplayBMP(BMP_ptr, x_pos, y_pos)
 
 		.global	GetPixelColor		// GetPixelColor(x_pos, y_pos)
-		.global	SetPixelColor		// SetPixelColor(pixel_color, x_pos, y_pos)
 
 // Equates (i.e. defines)
 
@@ -1371,7 +1365,6 @@ drwln7:
 		bne	drwln7				// Branch if not done
 
 drwln8:
-
 		mov	r0, #0				// No error
 		bal	drwln10
 
@@ -2091,15 +2084,15 @@ DisplayBMP:
 		cmp	r3, r4
 		bne	displayBMP4			// Branch if not a BMP
 
-		ldrh	r3, [r0, #26]			// Check for one plane
+		ldrb	r3, [r0, #26]			// Check for one plane
 		cmp	r3, #1
 		bne	displayBMP4			// Branch if not one plane
 
-		ldrh	r3, [r0, #28]			// Check for 24bpp
+		ldrb	r3, [r0, #28]			// Check for 24bpp
 		cmp	r3, #24
 		bne	displayBMP4			// Branch if not 24bpp
 
-		ldr	r3, [r0, #30]			// Check for no compression
+		ldrb	r3, [r0, #30]			// Check for no compression
 		cmp	r3, #0
 		bne	displayBMP4			// Branch if compressed
 
@@ -2110,7 +2103,7 @@ DisplayBMP:
 		cmp	r1, r4				// Check if x_pos is off screen
 		bge	displayBMP4			// Branch if x_pos is off screen
 
-		ldr	r3, [r0, #18]			// Get BMP horizontal size in pixels
+		ldr	r3, [r0, #18]			// Get BMP horizontal size
 		add	r3, r1, r3			// Add BMP horizontal size to x_pos
 		cmp	r3, r4				// Check if BMP would go off rightside of screen
 		bge	displayBMP4			// Branch if BMP would go off rightside of screen
@@ -2122,15 +2115,12 @@ DisplayBMP:
 		cmp	r2, r4				// Check if y_pos is off screen
 		bge	displayBMP4			// Branch if y_pos is off screen
 
-		ldr	r3, [r0, #22]			// Get BMP vertical size in pixels
+		ldr	r3, [r0, #22]			// Get BMP vertical size
 		add	r3, r2, r3			// Add BMP vertical size to y_pos
 		cmp	r3, r4				// Check if BMP would go off bottom of screen
 		bge	displayBMP4			// Branch if BMP would go off bottom of screen
 
-// Note: This gets a little tricky as the frame buffer begins at the upper-lefthand corner, but the BMP data begins at the lower-lefthand corner
-// So I'm going to read the BMP data sequentially and adjust the frame buffer address for each line
-
-		movw	r4, #:lower16:FRM_BUF_ADR	// Get frame buffer address
+		movw	r4, #:lower16:FRM_BUF_ADR		// Get frame buffer address
 		movt	r4, #:upper16:FRM_BUF_ADR
 		ldr	r4, [r4]
 
@@ -2147,69 +2137,67 @@ DisplayBMP:
 
 // Note: r4 now contains the frame buffer address for the upper-lefthand pixel of the BMP
 
-		ldrh	r1, [r0, #18]			// Get BMP horizontal size in pixels
+		ldr	r1, [r0, #18]			// Get BMP horizontal size
+		lsl	r8, r1, #2			// Compute BMP horizontal size in bytes in frame buffer for computing next horizontal line later
 
-		ldrh	r2, [r0, #22]			// Get BMP vertical size in pixels
+		ldr	r2, [r0, #22]			// Get BMP vertical size (vertical counter)
 
-		sub	r5, r2, #1			// Compute the BMP's vertical frame buffer offset in bytes
-		mul	r5, r5, r3
+// Compute the address of the upper-lefthand pixel in the BMP
 
-		add	r4, r5, r4			// Add BMP's vertical frame buffer offset in bytes to frame buffer address
+		ldr	r5, [r0, #10]			// Get BMP offset address
 
-// Note: r4 now contains the frame buffer address for the lower-lefthand pixel of the BMP
+		sub	r6, r2, #1			// Compute BMP vertical size - 1
 
-		lsl	r5, r1, #2			// Compute BMP horizontal size in pixels to bytes in frame buffer (i.e. multiply BMP horizontal size in pixels by 4)
-		add	r3, r3, r5			// Compute frame buffer offset for each BMP line
+		mov	r7, #3				// Compute BMP horizontal size in bytes (i. e. 3 * (BMP horizontal size))
+		mul	r7, r1, r7
 
-// Note: r3 now contains the offset to subtract from the frame buffer address for each new BMP line
+		lsl	r9, r7, #1			// Compute 2 * BMP horizontal size in bytes for computing next BMP horizontal line later
 
-		ldr	r8, [r0, #10]			// Get the offset
-		add	r0, r0, r8			// Add the offset to the BMP address
+		mul	r6, r6, r7			// Compute (BMP vertical size - 1) (3 * (BMP horizontal size))
 
-// Note: r0 now contains the address of the lower-lefthand pixel in the BMP
+		add	r5, r5, r6			// Add the offsets together
+		add	r0, r0, r5			// Add the offsets to the BMP address
 
-		and	r8, r8, #3			// Mask off just the lower 2 offset bits (used for getting to the end of the BMP scan lines)
+// Note: r0 now contains the address of the upper-lefthand pixel in the BMP
 
 displayBMP1:
 
-		mov	r5, r1				// Set horizontal counter to BMP horizontal size
+		mov	r7, r1				// Set horizontal counter to BMP horizontal size
 
 displayBMP2:
 
 // Combine the BMP red, green, and blue bytes
 
-		ldrb	r6, [r0], #1			// Get BMP blue byte, and increment address
+		ldrb	r5, [r0], #1			// Get BMP blue byte, and increment address
 
-		ldrb	r7, [r0], #1			// Get BMP green byte, and increment address
-		lsl	r7, #8				// Shift green byte 8-bits
+		ldrb	r6, [r0], #1			// Get BMP green byte, and increment address
+		lsl	r6, #8				// Shift green byte 8-bits
 
-		orr	r6, r6, r7			// Combine blue and green bytes together
+		orr	r5, r5, r6			// Combine blue and green bytes together
 
-		ldrb	r7, [r0], #1			// Get BMP red byte, and increment address
-		lsl	r7, #16				// Shift red byte 16-bits
+		ldrb	r6, [r0], #1			// Get BMP red byte, and increment address
+		lsl	r6, #16				// Shift red byte 16-bits
 
-		orr	r6, r6, r7			// Combine blue, green and red bytes together
+		orr	r5, r5, r6			// Combine blue, green and red bytes together
 
 // Store the BMP RGB in the frame buffer
 
-		str	r6, [r4], #4			// Store BMP RGB in frame buffer, and increment address
+		str	r5, [r4], #4			// Store BMP RGB in frame buffer, and increment address
 
-		subs	r5, r5, #1			// Decrement horizontal counter
+		subs	r7, r7, #1			// Decrement horizontal counter
 		bgt	displayBMP2			// Branch if not done
 
 		subs	r2, r2, #1			// Decrement vertical counter
 		beq	displayBMP3			// Branch if done
 
-// Round the BMP pixel address to a pixel word boundary
-
-		and	r5, r0, #3			// Mask off for just the lower 2 address bits
-		sub	r5, r8, r5			// Subtract lower 2 address bits from the lower 2 offset bits
-		and	r5, r5, #3			// Mask off for just the lower 2 bits
-		add	r0, r0, r5
-
 // Adjust the frame buffer address for the next horizontal line
 
-		sub	r4, r4, r3			// Subrtact the offset from the frame buffer address for each new BMP line (i.e move back to beginning of next horizontal line)
+		sub	r4, r4, r8			// Subrtact BMP horizontal size in bytes from frame buffer address (i.e move back to beginning of horizontal line)
+		add	r4, r4, r3			// Add horizontal size in bytes to frame buffer address (i.e. move down one horizontal line)
+
+// Adjust the BMP address for the next horizontal line
+
+		sub	r0, r0, r9			// Move BMP address back two lines (i.e. subtract 2 * ( 3 * (BMP horizontal size)) from the BMP address)
 
 		bal	displayBMP1			// Go do next horizontal line
 
@@ -2226,6 +2214,7 @@ displayBMP5:
 
 		pop	{r4-r11}			// Pop r4-r11 off stack
 		bx	lr				// Return
+
 
 /*******************************************************************************
 *
@@ -2295,78 +2284,6 @@ getpixcolor1:
 getpixcolor2:
 
 		pop	{r2}				// Pop r2 off stack
-		bx	lr				// Return
-
-/*******************************************************************************
-*
-* SetPixelColor - Sets the RGB color of the pixel at a specified x,y location.
-*
-* SetPixelColor(x_pos, y_pos)
-*  parameters:
-*    r0: RGB code		// pixel color (ex. 0x00RRGGBB)
-*    r1: x_pos			// x position (ex. 0-799)
-*    r2: y_pos			// y position (ex. 0-599)
-*  return:
-*       -1			// error
-*
-*******************************************************************************/
-
-		.type	SetPixelColor, %function
-
-SetPixelColor:
-
-		push	{r3}				// Push r3 on stack
-
-		cmp	r1, #0				// Check if x_pos is off screen, left
-		blt	setpixcolor1			// Branch if x_pos is off screen, left
-
-		movw	r3, #:lower16:H_SIZE		// Get screen horizontal size
-		movt	r3, #:upper16:H_SIZE
-		ldr	r3, [r3]
-
-		cmp	r1, r3				// Check if x_pos is off screen, right
-		bge	setpixcolor1			// Branch if x_pos is off screen, right
-
-		cmp	r2, #0				// Check if y_pos is off screen, top
-		blt	setpixcolor1			// Branch if y_pos is off screen, top
-
-		movw	r3, #:lower16:V_SIZE		// Get screen vertical size
-		movt	r3, #:upper16:V_SIZE
-		ldr	r3, [r3]
-
-		cmp	r2, r3				// Check if y_pos is off screen, bottom
-		bge	setpixcolor1			// Branch if y_pos is off screen, bottom
-
-		lsl	r1, r1, #2			// Compute horizontal offset in bytes (i.e. multiply x_pos by 4)
-
-		movw	r3, #:lower16:H_SIZE_BYTES	// Get screen horizontal size in bytes
-		movt	r3, #:upper16:H_SIZE_BYTES
-		ldr	r3, [r3]
-
-		mul	r2, r2, r3			// Compute vertical offset in bytes (i.e. multiply y_pos by screen horizontal size in bytes)
-
-		add	r2, r2, r1			// Add vertical and horizontal offsets in bytes together
-
-		movw	r1, #:lower16:FRM_BUF_ADR	// Get frame buffer address
-		movt	r1, #:upper16:FRM_BUF_ADR
-		ldr	r1, [r1]
-
-		add	r1, r1, r2			// Add horizontal and vertical offsets in bytes to frame buffer address
-
-// Note: r1 now contains the pixel address
-
-		str	r0, [r1]			// Set pixel RGB value
-
-		mov	r0, #0				// No error
-		bal	setpixcolor2
-
-setpixcolor1:
-
-		mov	r0, #-1				// Error
-
-setpixcolor2:
-
-		pop	{r3}				// Pop r3 off stack
 		bx	lr				// Return
 
 		.end
