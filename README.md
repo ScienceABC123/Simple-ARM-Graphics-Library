@@ -64,3 +64,8 @@ Version 1.2
 Minor rant: I was updating my Weather Station display with some BMPs and found that only about 1/3 of the BMPs would display correctly. After digging for a couple of days I found that Microsoft had buried a small detail in the notes about the BMP file format. It seems Microsoft pads "scanlines" with 0x00 bytes so they are always a word length (32-bits), which would make some sense if the offset in the BMP header pointed to a 32-bit boundary, which it does not! The BMP offset pointer always points to an odd half-word boundary (0b10).
 
 I rewrote the DisplayBMP function to fix the scanline padding issue, and it now works with all BMP files. If anyone comes accross a BMP file that isn't getting displayed correctly, please send me the details with the BMP file in question so I can fixed it.
+
+UPDATE - 11/20/25
+Version 1.3
+
+I actually created version 1.3 back in March, but forgot to update GitHub with it. My apologizes. I added one new function SetPixelColor to complement the function GetPixelColor.
