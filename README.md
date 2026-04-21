@@ -13,16 +13,23 @@ ScreenClear, clears the entire screen to a desired color
 SelectColors, selects the foreground and background colors for drawing and printing
 
 SelectFont, selects the font used for printing
+
 GetFontHeight, returns the cell height, in pixels, of the currently selected font
+
 GetStringLength, returns a specified string's length, in pixels, using the currently selected font
+
 PrintStringLeft, prints a left justified string at x,y location
+
 PrintStringRight, prints a right justified string at x,y location
+
 PrintStringCenter, prints a center justified string at x,y location
 
 DrawRectOutline, draws a foreground color rectangle bounded by x1,y1 and x2,y2
+
 DrawRectFilled, draws a foreground color rectangle filled with background color bounded by x1,y1 and x2,y2
 
 DrawCircleOutline, draws a foreground color circle centered at x,y with a specified radius
+
 DrawCircleFilled, draws a foreground color circle filled with background color centered at x,y with a specified radius
 
 DrawLine, draws a foreground color line from x1,y1 to x2,y2
@@ -30,9 +37,10 @@ DrawLine, draws a foreground color line from x1,y1 to x2,y2
 DisplayBMP, displays a BMP at x,y (x,y is the location of the BMP upper-lefthand corner)
 
 GetPixelColor, returns the pixel color of a specified pixel (x,y)
+
 SetPixelColor, sets the pixel color at a specified pixel (x,y)
 
-I’ve included the source and object files not only of the library but also several fonts, a BMP I used for testing/debugging, as well as a C example program (SAGL_example_program.c) that brings it all together to show off its capabilities (FYI: I used a 1920x1080 monitor so if you are using a smaller monitor some objects may not be displayed). There is included a BMP showing the screen that the example program will generate. I've also included examples of the assembler commandline, and C compiler commandline I used.
+I’ve included the source and object files not only of the library but also several fonts, a BMP I used for testing/debugging, as well as a C example program (SAGL_example_program.c) that brings it all together to show off all its capabilities (FYI: I used a 1920x1080 monitor so if you are using a smaller monitor some objects may not be displayed). There is included a BMP (print_screen.bmp) showing the screen that the example program will generate. I've also included examples of the assembler commandline, and C compiler commandline I used.
 
 Note: The library does require that the frame buffer be contiguous in memory (shouldn’t be a problem nowadays), start in the upper-lefthand corner, scan left-to-right, top-to-bottom (again, shouldn’t be a problem nowadays), and the pixel depth be 32-bits-per-pixel (i.e. 24-bit color).
 
