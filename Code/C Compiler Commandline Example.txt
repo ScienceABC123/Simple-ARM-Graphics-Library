@@ -1,0 +1,5 @@
+gcc -o <filename> <filename>.c <another filename>.o <yet another filename>.o -Wall
+
+Example, for SAGL_example_program.c
+
+gcc -o SAGL_example_program SAGL_example_program.c simple_arm_graphics.o font_VGA_9x16.o font_Arial32.o Test2_BMP.o -lm -Wall

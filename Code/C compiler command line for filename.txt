@@ -1,0 +1,1 @@
+gcc -o <filename> <filename>.c <other filename>.o -Wall

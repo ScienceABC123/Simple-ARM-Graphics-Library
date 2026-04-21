@@ -1,0 +1,2 @@
+as -o <filename>.o <filename>.s
+as -al -o <filename>.o <filename>.s > <filename>.lst
