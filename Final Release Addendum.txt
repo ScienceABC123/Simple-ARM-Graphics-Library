@@ -1,7 +1,7 @@
 Final Release Addendum
 
 I recently tried to load the SAGL development system I used from scratch, and found out there have been significant changes to Raspberry Pi OS in the last three years; some positive, some negative.
-On the positive side SSH is now automatically enabled. On the negative side 24-bit color (32 bits-per-pixel)takes a bit more to enable, and having the OS clear the screen now seems to merely set a
+On the positive side SSH is now automatically enabled. On the negative side 24-bit color (32 bits-per-pixel) takes a bit more to enable, and having the OS clear the screen now seems to merely set a
 flag and the OS clears the screen when it gets around to it.
 
 I have included a separate text file (SAGL Development OS setup.txt) with set-by-step instructions for getting 24-bit color to work.
