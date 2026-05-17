@@ -161,18 +161,13 @@ int main(int argc, char* argv[])
 		return(-1);
 	}
 
-	// Sleep for 1 second
+	// Move the system cursor down a line (to position the system prompt after this program ends)
 
-	sleep(1);
+	printf("\n");
 
-	// Use system call to clear the screen
+	// Sleep for 3 seconds
 
-	strcpy(str1, "clear");
-	system(str1);
-
-	// Move the system cursor down a few lines
-
-	printf("\n\n\n");
+	sleep(3);
 
 	// Initialize the Simple ARM Graphics library
 
