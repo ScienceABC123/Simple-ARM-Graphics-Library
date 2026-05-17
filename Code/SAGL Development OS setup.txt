@@ -1,0 +1,48 @@
+STEP 1: Raspberry Pi Imager
+
+  Raspberry Pi 3
+  Raspberry Pi OS (other)
+  Raspberry Pi OS (Legacy, 32-bit) Lite
+  Customisation: Choose username
+    Username: pi
+    Password: <password>
+    Confirm password: <password>
+  Customisation: Choose Wi-Fi
+    SSID: <enter Wi-Fi name>
+    Password: <enter Wi-Fi password>
+    Confirm password: <enter Wi-Fi password>
+
+
+STEP 2: Install OS
+
+  Install SD card in RaspberryPi 3 and boot (it may take a few minutes and a few reboots)
+
+  Login at the command prompt
+
+STEP 3: Raspberry Pi Software Configuration Tool
+
+  sudo raspi-config
+
+  System Options
+  Auto Login
+  <Yes>
+
+STEP 4: Edit config.txt
+
+  sudo nano /boot/firmware/config.txt
+
+  Change line from:
+    dtoverlay=vc4-kms-v3d
+  to:
+    # dtoverlay=vc4-kms-v3d
+
+  Add:
+    # HDMI Monitor 1920x1080
+    hdmi_group=2
+    hdmi_mode=1
+    hdmi_mode=87
+    hdmi_cvt=1920 1080 60 6 0 0 0
+
+STEP 5: Reboot
+
+  sudo reboot
