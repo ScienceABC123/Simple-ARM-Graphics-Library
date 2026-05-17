@@ -1,0 +1,11 @@
+Final Release Addendum
+
+I recently tried to load the SAGL development system I used from scratch, and found out there have been significant changes to Raspberry Pi OS in the last three years; some positive, some negative. On the positive side SSH is now automatically enabled. On the negative side 24-bit color takes a bit more to enable, and having the OS clear the screen now seems to merely set a flag and the OS clears the screen when it gets around to it.
+
+I have included a separate text file (SAGL Development OS setup.txt) with set-by-step instructions for getting 24-bit color to work.
+
+The SAGL example C program called the system to clear the screen before drawing and printing things on the screen using the SAGL. However, the OS wasn't clearing the screen until after the SAGL example C program had finished drawing and printing everything it does using the SAGL. So just a quick flicker of the output screen appeared before it got cleared. I removed the system call to clear the screen from the example C program to fix the issue. I recommend caution if you use the system call to clear the screen, it's better to use the SAGL's ScreenClear() command.
+
+I'm going to include a list of my GitHub projects that use the SAGL. I'll put that list on the SAGL root directory once I release them.
+
+As a bonus I included a separate text file (How to install WiringPi.txt) on the SAGL root directory. Two of my GitHub projects use WiringPi.

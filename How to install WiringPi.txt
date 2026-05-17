@@ -1,0 +1,14 @@
+Run these commands in order:
+
+sudo apt-get update
+
+sudo apt install git
+  Do you want to continue? [Y/n] y
+
+git clone https://github.com/WiringPi/WiringPi
+
+cd WiringPi
+
+./build
+
+gpio -v
