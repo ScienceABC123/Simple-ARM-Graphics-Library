@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Simple ARM Graphics Library 1.3
+* Simple ARM Graphics Library 1.4
 *
 * This 2D graphics library is intended for the Raspberry Pi boards, but can be
 * used other ARM boards as long as the video buffer starts in the upper-lefthand
@@ -12,7 +12,7 @@
 * NOTE: There is no provisions for rotating anything drawn, as I said this is a
 * "simple" graphics library.
 *
-* Copyright (c) 2022, 2024, 2025
+* Copyright (c) 2022, 2024, 2025, 2026
 *
 *******************************************************************************/
 
@@ -44,6 +44,12 @@
 *				scan lines to end on a offset word boundary
 * ------------------------------------------------------------------------------
 * 1.3	3/12/25		PMW	Added one new function: SetPixelColor
+*
+* ------------------------------------------------------------------------------
+* 1.4	6/16/26		PMW	PrintStringLeft checking for text going below the
+*				bottom edge and beyond the right side was short by
+*				one pixel. Both are now fixed and can now print to
+*				the bottom edge and right side.
 *
 *******************************************************************************/
 
@@ -444,7 +450,8 @@ PrintStringLeft:
 		movt	r4, #:upper16:FONTPIXHGT
 		ldr	r4, [r4]
 
-		sub	r3, r3, r4			// Compute lowest vertical text starting point
+		sub	r4, r4, #1			// Compute lowest vertical text starting point
+		sub	r3, r3, r4
 
 		cmp	r2, r3				// Check if text would be below bottom of screen
 		bge	prtstrlf19			// Branch if text would be below bottom of screen
@@ -540,7 +547,8 @@ prtstrlf3:
 		movt	r7, #:upper16:H_SIZE
 		ldr	r7, [r7]
 
-		cmp	r1, r7				// Check if text would be off screen, right
+		add	r7, r7, #1			// Check if text would be off screen, right
+		cmp	r1, r7
 		bge	prtstrlf18			// Branch if text would be off screen, right
 
 // Print blank horizontal lines before the glyph
