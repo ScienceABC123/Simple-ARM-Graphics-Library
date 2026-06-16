@@ -1,0 +1,5 @@
+List of released projects that use Simple ARM Graphics Library (SAGL)
+
+1. Fancy Font Clock (https://github.com/ScienceABC123/Fancy-Font-Clock)
+
+2.
