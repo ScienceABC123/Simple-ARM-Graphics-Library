@@ -52,6 +52,6 @@ I have tested the code thoroughly, but if anyone finds an error, please let me k
 
 Finally, the copyright notice is only to ensure someone else doesn’t try to claim ownership. These files I’m freely making available for anyone to use, modify, and change, without any required attribution or compensation. I am making them henceforth “public domain" property.
 
-If you have any questions, feel free to contact me.
+If you have any questions, feel free to contact me (paul.weber271@gmail.com).
 
 Enjoy!
